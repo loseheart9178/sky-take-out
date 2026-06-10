@@ -1,0 +1,7 @@
+**/target/
+.codegraph/
+.idea
+*.iml
+*.class
+*Test.java
+**/test/
