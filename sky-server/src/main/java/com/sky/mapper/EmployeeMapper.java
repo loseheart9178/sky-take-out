@@ -3,6 +3,7 @@ package com.sky.mapper;
 import com.github.pagehelper.Page;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
+import com.sky.vo.EmployeeVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -38,4 +39,12 @@ public interface EmployeeMapper {
      * @param employee 员工对象
      */
     void update(Employee employee);
+
+    /**
+     * 根据id查询员工信息
+     * @param id 员工id
+     * @return EmployeeVO
+     */
+    @Select("select id, username, name, phone, sex, id_number, status from employee where id = #{id}")
+    EmployeeVO getById(Long id);
 }

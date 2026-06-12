@@ -5,6 +5,7 @@ import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.result.PageResult;
+import com.sky.vo.EmployeeVO;
 
 public interface EmployeeService {
 
@@ -34,4 +35,18 @@ public interface EmployeeService {
      * @param id 员工id
      */
     void setEmployeeStatus(Integer status, Long id);
+
+    /**
+     * 根据id查询员工信息
+     * @param id 员工id
+     * @return EmployeeVO
+     *
+     */
+    EmployeeVO getById(Long id);
+
+    /**
+     * 修改员工信息
+     * @param employeeDTO 员工对象
+     */
+    void update(EmployeeDTO employeeDTO);
 }
