@@ -12,8 +12,8 @@ import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
+import com.sky.exception.PermissionDeniedException;
 import com.sky.mapper.EmployeeMapper;
-import com.sky.properties.JwtProperties;
 import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
 import com.sky.utils.UserContextUtil;
@@ -96,6 +96,24 @@ public class EmployeeServiceImpl implements EmployeeService {
         PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
         Page<Employee> page=employeeMapper.pageQuery(employeePageQueryDTO);
         return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    @Override
+    public void setEmployeeStatus(Integer status, Long id) {
+        //检查当前操作人是否为管理员
+        Long currentUpdateEmployeeId = UserContextUtil.getCurrentEmployeeId();
+        if(!Objects.equals(currentUpdateEmployeeId, 1L)){
+            throw new PermissionDeniedException(MessageConstant.PERMISSION_DENIED);
+        }
+
+        Employee employee=Employee
+                .builder()
+                .status(status)
+                .id(id)
+                .updateTime(LocalDateTime.now())
+                .updateUser(currentUpdateEmployeeId)
+                .build();
+        employeeMapper.update(employee);
     }
 
 }

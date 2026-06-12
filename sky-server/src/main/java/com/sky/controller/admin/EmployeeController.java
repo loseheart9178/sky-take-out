@@ -95,4 +95,16 @@ public class EmployeeController {
         return Result.success(pageResult);
     }
 
+    /**
+     * 修改员工状态
+     * @param status 状态
+     * @param id 员工id
+     * @return Result
+     */
+    @PostMapping("/status/{status}")
+    public Result<String> setEmployeeStatus(@PathVariable Integer status, @RequestParam Long id){
+        log.info("修改员工状态，状态：{}，id：{}", status, id);
+        employeeService.setEmployeeStatus(status, id);
+        return Result.success();
+    }
 }
