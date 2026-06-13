@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import java.io.ByteArrayInputStream;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -22,30 +23,27 @@ public class AliOssUtil {
     /**
      * 文件上传
      *
-     * @param bytes
-     * @param objectName
-     * @return
+     * @param bytes 文件字节数组
+     * @param objectName 文件路径
+     * @return 文件访问路径
      */
     public String upload(byte[] bytes, String objectName) {
+        String extension = objectName.substring(objectName.lastIndexOf("."));
+        String uploadObjectName = UUID.randomUUID().toString() + extension;
 
         // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
         try {
             // 创建PutObject请求。
-            ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(bytes));
+            ossClient.putObject(bucketName, uploadObjectName, new ByteArrayInputStream(bytes));
         } catch (OSSException oe) {
-            System.out.println("Caught an OSSException, which means your request made it to OSS, "
-                    + "but was rejected with an error response for some reason.");
-            System.out.println("Error Message:" + oe.getErrorMessage());
-            System.out.println("Error Code:" + oe.getErrorCode());
-            System.out.println("Request ID:" + oe.getRequestId());
-            System.out.println("Host ID:" + oe.getHostId());
+            log.error("OSS上传失败，ErrorCode: {}, RequestId: {}, HostId: {}",
+                    oe.getErrorCode(), oe.getRequestId(), oe.getHostId(), oe);
+            throw oe;
         } catch (ClientException ce) {
-            System.out.println("Caught an ClientException, which means the client encountered "
-                    + "a serious internal problem while trying to communicate with OSS, "
-                    + "such as not being able to access the network.");
-            System.out.println("Error Message:" + ce.getMessage());
+            log.error("OSS客户端异常", ce);
+            throw ce;
         } finally {
             if (ossClient != null) {
                 ossClient.shutdown();
@@ -53,16 +51,20 @@ public class AliOssUtil {
         }
 
         //文件访问路径规则 https://BucketName.Endpoint/ObjectName
-        StringBuilder stringBuilder = new StringBuilder("https://");
-        stringBuilder
+        String[] parts = endpoint.split("//");
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(parts[0])
+                .append("//")
                 .append(bucketName)
                 .append(".")
-                .append(endpoint)
+                .append(parts[1])
                 .append("/")
-                .append(objectName);
+                .append(uploadObjectName);
 
-        log.info("文件上传到:{}", stringBuilder.toString());
+        String fileUrl = urlBuilder.toString();
+        log.info("文件上传成功，访问路径: {}", fileUrl);
 
-        return stringBuilder.toString();
+        return fileUrl;
+
     }
 }

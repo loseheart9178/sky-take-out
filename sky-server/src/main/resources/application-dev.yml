@@ -6,3 +6,8 @@ sky:
     database: sky_take_out
     username: root
     password: lu20060817
+  alioss:
+    endpoint: ${ALI_OSS_ENDPOINT:https://oss-cn-beijing.aliyuncs.com}
+    bucket-name: ${ALI_OSS_BUCKET_NAME:java-ai-9178}
+    access-key-id: ${ALI_OSS_ACCESS_KEY_ID:${ALIBABA_CLOUD_ACCESS_KEY_ID:${ALIYUN_ACCESS_KEY_ID:}}}
+    access-key-secret: ${ALI_OSS_ACCESS_KEY_SECRET:${ALIBABA_CLOUD_ACCESS_KEY_SECRET:${ALIYUN_ACCESS_KEY_SECRET:}}}
