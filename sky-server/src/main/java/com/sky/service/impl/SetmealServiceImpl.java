@@ -68,6 +68,7 @@ public class SetmealServiceImpl implements SetmealService {
      * 批量删除套餐
      * @param ids 套餐id数组
      */
+    @Transactional
     @Override
     public void deleteBatch(List<Long> ids) {
 
