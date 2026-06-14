@@ -26,8 +26,8 @@ public class CategoryController {
 
     /**
      * 新增分类
-     * @param categoryDTO
-     * @return
+     * @param categoryDTO 分类数据
+     * @return  Result
      */
     @PostMapping
     public Result<String> save(@RequestBody CategoryDTO categoryDTO){
@@ -38,8 +38,8 @@ public class CategoryController {
 
     /**
      * 分类分页查询
-     * @param categoryPageQueryDTO
-     * @return
+      * @param categoryPageQueryDTO 分类分页查询条件
+      * @return  Result<PageResult>
      */
     @GetMapping("/page")
     public Result<PageResult> page(CategoryPageQueryDTO categoryPageQueryDTO){
@@ -50,8 +50,8 @@ public class CategoryController {
 
     /**
      * 删除分类
-     * @param id
-     * @return
+      * @param id 分类id
+      * @return  Result
      */
     @DeleteMapping
     public Result<String> deleteById(Long id){
@@ -62,8 +62,8 @@ public class CategoryController {
 
     /**
      * 修改分类
-     * @param categoryDTO
-     * @return
+      * @param categoryDTO 分类数据
+      * @return  Result
      */
     @PutMapping
     public Result<String> update(@RequestBody CategoryDTO categoryDTO){
@@ -73,9 +73,9 @@ public class CategoryController {
 
     /**
      * 启用、禁用分类
-     * @param status
-     * @param id
-     * @return
+      * @param status 状态
+      * @param id 分类id
+      * @return  Result
      */
     @PostMapping("/status/{status}")
     public Result<String> startOrStop(@PathVariable("status") Integer status, Long id){
@@ -85,8 +85,8 @@ public class CategoryController {
 
     /**
      * 根据类型查询分类
-     * @param type
-     * @return
+      * @param type 类型
+      * @return  Result<List<Category>>
      */
     @GetMapping("/list")
     public Result<List<Category>> list(Integer type){

@@ -17,8 +17,8 @@ public interface DishMapper {
 
     /**
      * 根据分类id查询菜品数量
-     * @param categoryId
-     * @return
+     * @param categoryId 分类id
+     * @return 菜品数量
      */
     @Select("select count(id) from dish where category_id = #{categoryId}")
     Integer countByCategoryId(Long categoryId);
@@ -54,7 +54,7 @@ public interface DishMapper {
 
     /**
      * 批量id删除菜品
-     * @param ids
+      * @param ids 菜品id
      */
     void deleteByIds(List<Long> ids);
 
@@ -64,4 +64,12 @@ public interface DishMapper {
      */
     @AutoFill(value = OperationType.UPDATE)
     void update(Dish dish);
+
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId 分类id
+     * @return 菜品列表
+     */
+    @Select("select * from dish where category_id = #{categoryId}")
+    List<Dish> listByCategory(Long categoryId);
 }

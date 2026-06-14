@@ -2,12 +2,14 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.annotation.AutoFill;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.enumeration.OperationType;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,6 +42,7 @@ public class DishServiceImpl implements DishService {
      * 新增菜品，同时保存对应的口味数据
      * @param dishDTO 菜品和口味数据
      */
+    @AutoFill(value = OperationType.INSERT)
     @Override
     @Transactional
     public void saveWithFlavor(DishDTO dishDTO) {
@@ -108,6 +112,11 @@ public class DishServiceImpl implements DishService {
         dishFlavorMapper.deleteByDishIds(ids);
     }
 
+    /**
+     * 根据id查询菜品和对应的口味数据
+     * @param id 菜品id
+     * @return DishVO 菜品数据
+     */
     @Override
     public DishVO getByIdWithFlavor(Long id) {
         //根据id查询菜品数据
@@ -121,6 +130,11 @@ public class DishServiceImpl implements DishService {
         return dishVO;
     }
 
+    /**
+     * 修改菜品
+     * @param dishDTO 菜品数据
+     */
+    @AutoFill(value = OperationType.UPDATE)
     @Override
     public void updateWithFlavor(DishDTO dishDTO) {
         //更新菜品表数据
@@ -129,16 +143,36 @@ public class DishServiceImpl implements DishService {
         dishMapper.update(dish);
         //更新口味表数据
 
+        Long dishId = dishDTO.getId();
         //删除当前菜品对应的口味数据
-        dishFlavorMapper.deleteByDishId(dishDTO.getId());
+        dishFlavorMapper.deleteByDishId(dishId);
         //重新插入口味数据
         List<DishFlavor> flavors = dishDTO.getFlavors();
         if (flavors != null && !flavors.isEmpty()) {
             //遍历flavors列表，设置每个口味的dishId
             for (DishFlavor flavor : flavors) {
-                flavor.setDishId(dishDTO.getId());
+                flavor.setDishId(dishId);
             }
             dishFlavorMapper.insertBatch(flavors);
         }
+    }
+
+    /**
+     * 批量起售停售
+     * @param status 状态
+     * @param id 菜品id
+     */
+    @Override
+    public void updateStatus(Integer status, Long id) {
+        Dish dish = Dish.builder()
+                .status(status)
+                .id(id)
+                .build();
+                dishMapper.update(dish);
+    }
+
+    @Override
+    public List<Dish> listByCategory(Long categoryId) {
+        return dishMapper.listByCategory(categoryId);
     }
 }
