@@ -15,6 +15,16 @@
              #{createTime}, #{updateTime}, #{createUser}, #{updateUser},
              #{image}, #{description})
     </insert>
+
+    <!--
+    批量删除套餐
+    -->
+    <delete id="deleteBatch">
+        delete from setmeal where id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
     <!--
     套餐分页查询
     -->
@@ -26,5 +36,14 @@
             <if test="status != null">and s.status = #{status}</if>
         </where>
         order by s.create_time desc
+    </select>
+    <!--
+    查询起售套餐数量
+    -->
+    <select id="countBySetmealId" resultType="java.lang.Integer">
+        select count(id) from setmeal where status=1 and id in
+        <foreach item="id" collection="ids" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
     </select>
 </mapper>

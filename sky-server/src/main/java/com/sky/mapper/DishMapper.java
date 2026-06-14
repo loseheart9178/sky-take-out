@@ -72,4 +72,11 @@ public interface DishMapper {
      */
     @Select("select * from dish where category_id = #{categoryId}")
     List<Dish> listByCategory(Long categoryId);
+
+    /**
+     * 检查是否有菜品处于启用状态
+     * @param ids 菜品id列表
+     * @return 启用状态的菜品数量
+     */
+    Integer countEnabledStatus(List<Long> ids);
 }

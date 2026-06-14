@@ -54,6 +54,16 @@
     </delete>
 
     <!--
+    检查是否有菜品处于启用状态
+    -->
+    <select id="countEnabledStatus" resultType="java.lang.Integer">
+        select count(id) from dish where status = 1 and id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!--
     分页查询菜品
     -->
     <select id="pageQuery" resultType="com.sky.vo.DishVO">
