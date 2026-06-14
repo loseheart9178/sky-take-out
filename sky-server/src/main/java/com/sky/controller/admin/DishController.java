@@ -5,9 +5,12 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
+import com.sky.vo.DishVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -38,5 +41,38 @@ public class DishController {
         log.info("菜品分页查询：{}", dishPageQueryDTO);
         PageResult pageResult = dishService.pageQuery(dishPageQueryDTO);
         return Result.success(pageResult);
+    }
+    /**
+     * 批量删除菜品
+     * @param ids 菜品id数组
+     * @return  Result
+     */
+    @DeleteMapping
+    public Result delete(@RequestParam List<Long> ids) {
+        log.info("批量删除菜品，ids：{}", ids);
+        dishService.deleteBatch(ids);
+        return Result.success();
+    }
+    /**
+     * 根据id查询菜品信息和口味信息
+     * @param id 菜品id
+     * @return  Result<DishVO>
+     */
+    @GetMapping("/{id}")
+    public Result<DishVO> getById(@PathVariable Long id) {
+        log.info("根据id查询菜品信息：{}", id);
+        DishVO dishVO = dishService.getByIdWithFlavor(id);
+        return Result.success(dishVO);
+    }
+    /**
+     * 修改菜品信息，同时更新对应的口味信息
+     * @param dishDTO 菜品和口味数据
+     * @return  Result
+     */
+    @PutMapping
+    public Result update(@RequestBody DishDTO dishDTO) {
+        log.info("修改菜品信息：{}", dishDTO);
+        dishService.updateWithFlavor(dishDTO);
+        return Result.success();
     }
 }
