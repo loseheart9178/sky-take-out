@@ -45,4 +45,18 @@ public interface SetmealMapper {
      * @param ids 套餐id数组
      */
     void deleteBatch(List<Long> ids);
+
+    /**
+     * 根据id查询套餐数据
+     * @param id 套餐id
+     * @return 套餐数据
+     */
+    @Select("select * from setmeal where id = #{id}")
+    Setmeal getById(Long id);
+
+    /**
+     * 修改套餐数据
+     * @param setmeal 套餐数据
+     */
+    void update(Setmeal setmeal);
 }

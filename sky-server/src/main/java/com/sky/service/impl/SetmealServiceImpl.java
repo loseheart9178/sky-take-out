@@ -4,12 +4,16 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.annotation.AutoFill;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.enumeration.OperationType;
 import com.sky.exception.DeletionNotAllowedException;
+import com.sky.exception.SetmealEnableFailedException;
+import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
@@ -30,6 +34,8 @@ public class SetmealServiceImpl implements SetmealService {
     private SetmealMapper setmealMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private DishMapper dishMapper;
     /**
      * 新增套餐，同时需要保存套餐和菜品的关联关系
      * @param setmealDTO 套餐DTO
@@ -82,5 +88,66 @@ public class SetmealServiceImpl implements SetmealService {
         setmealMapper.deleteBatch(ids);
         //删除套餐和菜品的关联表数据
         setmealDishMapper.deleteBySetmealIds(ids);
+    }
+
+    /**
+     * 根据id查询套餐和关联的菜品数据
+     * @param id 套餐id
+     * @return SetmealVO 套餐数据
+     */
+    @Override
+    public SetmealVO getByIdWithDish(Long id) {
+        Setmeal setmeal = setmealMapper.getById(id);
+        List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(id);
+        SetmealVO setmealVO = new SetmealVO();
+        BeanUtils.copyProperties(setmeal, setmealVO);
+        setmealVO.setSetmealDishes(setmealDishes);
+        return setmealVO;
+    }
+
+    /**
+     * 修改套餐
+     * @param setmealDTO 套餐数据
+     */
+    @Transactional
+    @AutoFill(value = OperationType.UPDATE)
+    @Override
+    public void updateWithDish(SetmealDTO setmealDTO) {
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+        //修改套餐表数据
+        setmealMapper.update(setmeal);
+        //删除套餐和菜品的关联表数据
+        Long setmealId = setmealDTO.getId();
+        setmealDishMapper.deleteBySetmealId(setmealId);
+        //重新插入新的套餐和菜品的关联数据
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        if (setmealDishes != null && !setmealDishes.isEmpty()){
+            setmealDishes.forEach(setmealDish -> {
+                setmealDish.setSetmealId(setmealId);
+            });
+        }
+
+        setmealDishMapper.insertBatch(setmealDishes);
+    }
+
+    @Override
+    public void updateStatus(Integer status, Long id) {
+        // 启售套餐时，如果套餐内包含停售的菜品，则不能启售，抛出业务异常
+        if (status.equals(StatusConstant.ENABLE)) {
+            List<Dish> dishes = dishMapper.getBySetmealId(id);
+            if (dishes != null && !dishes.isEmpty()) {
+                dishes.forEach(dish -> {
+                    if (dish.getStatus().equals(StatusConstant.DISABLE)) {
+                        throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+                    }
+                });
+            }
+        }
+        Setmeal setmeal = Setmeal.builder()
+                .id(id)
+                .status(status)
+                .build();
+                setmealMapper.update(setmeal);
     }
 }

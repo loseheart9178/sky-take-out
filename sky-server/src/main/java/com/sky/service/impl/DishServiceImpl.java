@@ -124,6 +124,7 @@ public class DishServiceImpl implements DishService {
      * 修改菜品
      * @param dishDTO 菜品数据
      */
+    @Transactional
     @AutoFill(value = OperationType.UPDATE)
     @Override
     public void updateWithFlavor(DishDTO dishDTO) {
