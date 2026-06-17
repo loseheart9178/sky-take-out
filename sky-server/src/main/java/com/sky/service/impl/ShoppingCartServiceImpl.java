@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -71,5 +72,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
 
         shoppingCartMapper.insert(shoppingCart);
+    }
+
+    @Override
+    public List<ShoppingCart> showShoppingCart() {
+        //获取当前用户id
+        Long userId = RequestContextUtil.getCurrentUserId();
+        return shoppingCartMapper.list(ShoppingCart.builder().userId(userId).build());
     }
 }
