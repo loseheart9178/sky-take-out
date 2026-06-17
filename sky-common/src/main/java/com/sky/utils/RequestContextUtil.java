@@ -17,13 +17,13 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Component
 @Slf4j
-public class UserContextUtil {
+public class RequestContextUtil {
 
     private static JwtProperties jwtProperties;
 
     @Autowired
     public void setJwtProperties(JwtProperties jwtProperties) {
-        UserContextUtil.jwtProperties = jwtProperties;
+        RequestContextUtil.jwtProperties = jwtProperties;
     }
 
     /**

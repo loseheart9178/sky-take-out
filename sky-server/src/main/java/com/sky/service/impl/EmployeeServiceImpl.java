@@ -16,14 +16,13 @@ import com.sky.exception.PermissionDeniedException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
-import com.sky.utils.UserContextUtil;
+import com.sky.utils.RequestContextUtil;
 import com.sky.vo.EmployeeVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
@@ -111,7 +110,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void setEmployeeStatus(Integer status, Long id) {
         //检查当前操作人是否为管理员
-        Long currentUpdateEmployeeId = UserContextUtil.getCurrentEmployeeId();
+        Long currentUpdateEmployeeId = RequestContextUtil.getCurrentEmployeeId();
         if(!Objects.equals(currentUpdateEmployeeId, 1L)){
             throw new PermissionDeniedException(MessageConstant.PERMISSION_DENIED);
         }

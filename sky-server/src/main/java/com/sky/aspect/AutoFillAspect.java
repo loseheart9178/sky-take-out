@@ -3,7 +3,7 @@ package com.sky.aspect;
 import com.sky.annotation.AutoFill;
 import com.sky.constant.AutoFillConstant;
 import com.sky.enumeration.OperationType;
-import com.sky.utils.UserContextUtil;
+import com.sky.utils.RequestContextUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -51,7 +51,7 @@ public class AutoFillAspect {
 
         //准备赋值数据
         LocalDateTime now = LocalDateTime.now();
-        Long currentId = UserContextUtil.getCurrentEmployeeId();
+        Long currentId = RequestContextUtil.getCurrentEmployeeId();
         //根据对应的数据库操作类型，为对应的字段赋值
         if(operationType == OperationType.INSERT){
             //获取实体对象的set方法
