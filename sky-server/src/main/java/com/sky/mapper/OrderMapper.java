@@ -5,7 +5,11 @@ import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Mapper
 public interface OrderMapper {
@@ -49,4 +53,32 @@ public interface OrderMapper {
      */
     @Select("select count(*) from orders where status = #{status}")
     Integer countStatus(Integer status);
+
+    /**
+     * 查询超时的订单
+     * @param pendingPayment
+     * @param time
+     * @return
+     */
+    @Select("select * from orders where status = #{pendingPayment} and order_time < #{time}")
+    List<Orders> getByStatusAndOrderTimeLT(Integer pendingPayment, LocalDateTime time);
+
+
+
+    /**
+     * 取消支付超时且仍处于待支付、未支付状态的订单
+     */
+    int cancelTimeoutOrders(@Param("time") LocalDateTime time,
+                            @Param("cancelTime") LocalDateTime cancelTime,
+                            @Param("pendingPaymentStatus") Integer pendingPaymentStatus,
+                            @Param("unPaidStatus") Integer unPaidStatus,
+                            @Param("cancelledStatus") Integer cancelledStatus);
+
+    /**
+     * 完成超时且仍处于派送中的订单
+     */
+    int completeDeliveryOrders(@Param("time") LocalDateTime time,
+                               @Param("deliveryTime") LocalDateTime deliveryTime,
+                               @Param("deliveryInProgressStatus") Integer deliveryInProgressStatus,
+                               @Param("completedStatus") Integer completedStatus);
 }

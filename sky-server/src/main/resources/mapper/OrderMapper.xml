@@ -42,6 +42,24 @@
         where id = #{id}
     </update>
 
+    <update id="cancelTimeoutOrders">
+        update orders
+        set status = #{cancelledStatus},
+            cancel_reason = '支付超时',
+            cancel_time = #{cancelTime}
+        where status = #{pendingPaymentStatus}
+          and pay_status = #{unPaidStatus}
+          and order_time &lt; #{time}
+    </update>
+
+    <update id="completeDeliveryOrders">
+        update orders
+        set status = #{completedStatus},
+            delivery_time = #{deliveryTime}
+        where status = #{deliveryInProgressStatus}
+          and order_time &lt; #{time}
+    </update>
+
 
     <select id="pageQuery" resultType="com.sky.vo.OrderVO">
         select * from orders
